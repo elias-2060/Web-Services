@@ -13,6 +13,45 @@ TMDB_BASE_URL = "https://api.themoviedb.org/3"
 QUICKCHART_BASE_URL = "https://quickchart.io/chart"
 
 
+# Endpoint to list all movies
+class AllMovies(Resource):
+    def get(self):
+        """
+        Get a list of all movies
+        ---
+        tags:
+          - Movies
+        parameters:
+          - name: n
+            in: query
+            type: integer
+            required: true
+            description: Number of movies to list (1-20)
+        responses:
+          200:
+            description: A list of all movies
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  vote_average:
+                    type: number
+        """
+        n = int(request.args.get('n', 10))  # Default to 10 movies
+        if not (1 <= n <= 20):
+            return {"error": "n must be between 1 and 20"}, 400
+
+        # Fetching popular movies
+        response = requests.get(f"{TMDB_BASE_URL}/discover/movie?api_key={TMDB_API_KEY}&language=en-US&page=1")
+        data = response.json()
+
+        # Return the movies
+        return jsonify(data['results'][:n])
+
+
 # Endpoint to list popular movies
 class PopularMovies(Resource):
     def get(self):
@@ -49,7 +88,7 @@ class PopularMovies(Resource):
 
 
 # Endpoint to find movies with similar genres
-class SimilarGenres(Resource):
+class CommonGenres(Resource):
     def get(self, movie_id):
         """
         Get movies with similar genres to a specific movie
@@ -256,8 +295,9 @@ class FavoriteMovies(Resource):
         return {"favorites": favorites}
 
 
+api.add_resource(AllMovies, "/movies")
 api.add_resource(PopularMovies, "/movies/popular")
-api.add_resource(SimilarGenres, "/movies/similar_genres/<int:movie_id>")
+api.add_resource(CommonGenres, "/movies/similar_genres/<int:movie_id>")
 api.add_resource(SimilarRuntime, "/movies/similar_runtime/<int:movie_id>")
 api.add_resource(MovieComparison, "/movies/compare")
 api.add_resource(FavoriteMovies, "/movies/favorites", "/movies/favorites/<int:movie_id>")
