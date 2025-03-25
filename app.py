@@ -3,21 +3,22 @@ from flask_restful import Api, Resource
 from flasgger import Swagger
 import requests
 import json
+import random
 
 app = Flask(__name__)
 api = Api(app)
 swagger = Swagger(app)
 
-TMDB_API_KEY = "YOUR_TMDB_API_KEY"
+TMDB_API_KEY = "2801197321e5eb6e35677a074ae45024"
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 QUICKCHART_BASE_URL = "https://quickchart.io/chart"
 
 
-# Endpoint to list all movies
-class AllMovies(Resource):
+# Endpoint to list random movies
+class RandomMovies(Resource):
     def get(self):
         """
-        Get a list of all movies
+        Get a list of random movies
         ---
         tags:
           - Movies
@@ -26,10 +27,10 @@ class AllMovies(Resource):
             in: query
             type: integer
             required: true
-            description: Number of movies to list (1-20)
+            description: Number of random movies to list (1-20)
         responses:
           200:
-            description: A list of all movies
+            description: A list of random movies
             schema:
               type: array
               items:
@@ -44,12 +45,15 @@ class AllMovies(Resource):
         if not (1 <= n <= 20):
             return {"error": "n must be between 1 and 20"}, 400
 
-        # Fetching popular movies
-        response = requests.get(f"{TMDB_BASE_URL}/discover/movie?api_key={TMDB_API_KEY}&language=en-US&page=1")
+        # Get a random page
+        random_page = random.randint(1, 500)
+        response = requests.get(f"{TMDB_BASE_URL}/discover/movie?api_key={TMDB_API_KEY}&language=en-US&page={random_page}")
         data = response.json()
 
-        # Return the movies
-        return jsonify(data['results'][:n])
+        # Shuffle and return a random selection
+        movies = data.get('results', [])
+        random.shuffle(movies)
+        return jsonify(movies[:n])
 
 
 # Endpoint to list popular movies
@@ -295,7 +299,7 @@ class FavoriteMovies(Resource):
         return {"favorites": favorites}
 
 
-api.add_resource(AllMovies, "/movies")
+api.add_resource(RandomMovies, "/movies")
 api.add_resource(PopularMovies, "/movies/popular")
 api.add_resource(CommonGenres, "/movies/similar_genres/<int:movie_id>")
 api.add_resource(SimilarRuntime, "/movies/similar_runtime/<int:movie_id>")
