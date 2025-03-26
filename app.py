@@ -1,6 +1,16 @@
 from routes.movies import *
 from config import *
 from utils import *
+from flask_cors import CORS
+
+# Allow only your frontend's origin
+CORS(app, resources={
+    r"/movies/*": {
+        "origins": ["http://localhost:3000", "http://your-production-domain.com"],
+        "methods": ["GET", "POST", "DELETE"],
+        "allow_headers": ["API-Key", "Content-Type"]
+    }
+})
 
 # Register Routes
 api.add_resource(RandomMovies, "/movies")
