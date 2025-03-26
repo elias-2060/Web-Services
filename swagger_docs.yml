@@ -1,0 +1,406 @@
+swagger: "2.0"
+info:
+  description: "API for fetching movie data from TMDB API."
+  version: "1.0.0"
+  title: "Movies API"
+
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    in: header
+    name: api-key  # The header name where the API key is sent
+
+security:
+  - ApiKeyAuth: []  # Applying the API key authentication globally
+
+paths:
+  /movies:
+    get:
+      tags:
+        - Movies
+      summary: "Get a list of random movies"
+      parameters:
+        - name: n
+          in: query
+          type: integer
+          required: true
+          description: "Number of random movies to list (1-20)"
+          minimum: 1
+          maximum: 20
+      responses:
+        200:
+          description: "A list of random movies"
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                vote_average:
+                  type: number
+        400:
+          description: "Invalid parameter value"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+        500:
+          description: "Internal server error when fetching movies"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+  /movies/popular:
+    get:
+      tags:
+        - Movies
+      summary: "Get a list of popular movies"
+      parameters:
+        - name: n
+          in: query
+          type: integer
+          required: true
+          description: "Number of popular movies to list (1-20)"
+          minimum: 1
+          maximum: 20
+      responses:
+        200:
+          description: "A list of popular movies"
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                vote_average:
+                  type: number
+        400:
+          description: "Invalid parameter value"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+        404:
+          description: "No popular movies found"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+        500:
+          description: "Internal server error"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+  /movies/{movie_id}/similar-genres:
+    get:
+      tags:
+        - Movies
+      summary: "Get movies with similar genres to a specific movie"
+      parameters:
+        - name: movie_id
+          in: path
+          type: integer
+          required: true
+          description: "The movie ID to search for similar genres"
+      responses:
+        200:
+          description: "A list of movies with similar genres"
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                genre_ids:
+                  type: array
+                  items:
+                    type: integer
+        400:
+          description: "Invalid movie ID or no genres found"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+        404:
+          description: "Movie not found"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+        500:
+          description: "Internal server error"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+  /movies/{movie_id}/similar-runtime:
+    get:
+      tags:
+        - Movies
+      summary: "Get movies with similar runtime to a specific movie"
+      parameters:
+        - name: movie_id
+          in: path
+          type: integer
+          required: true
+          description: "The movie ID to search for similar runtime"
+      responses:
+        200:
+          description: "A list of movies with similar runtime"
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                runtime:
+                  type: integer
+        400:
+          description: "Invalid movie ID or runtime not found"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+        404:
+          description: "Movie not found"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+        500:
+          description: "Internal server error"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+  /movies/compare:
+    post:
+      tags:
+        - Movies
+      summary: "Generate a comparison chart for movies based on their scores"
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              movie_ids:
+                type: array
+                items:
+                  type: integer
+      responses:
+        200:
+          description: "URL of the generated chart"
+          schema:
+            type: object
+            properties:
+              chart_url:
+                type: string
+        400:
+          description: "Invalid request or no movie IDs provided"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+        404:
+          description: "One or more movies not found"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+              not_found_ids:
+                type: array
+                items:
+                  type: integer
+        500:
+          description: "Internal server error"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+  /movies/favorites/{movie_id}:
+    post:
+      tags:
+        - Movies
+      summary: "Add a movie to favorites"
+      parameters:
+        - name: movie_id
+          in: path
+          type: integer
+          required: true
+          description: "The movie ID to add to favorites"
+      responses:
+        200:
+          description: "Movie added to favorites"
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              favorites:
+                type: array
+                items:
+                  type: integer
+        400:
+          description: "Movie already in favorites (no action taken)"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+              favorites:
+                type: array
+                items:
+                  type: integer
+        404:
+          description: "Movie not found"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+        500:
+          description: "Internal server error"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+    delete:
+      tags:
+        - Movies
+      summary: "Remove a movie from favorites"
+      parameters:
+        - name: movie_id
+          in: path
+          type: integer
+          required: true
+          description: "The movie ID to remove from favorites"
+      responses:
+        200:
+          description: "Movie removed from favorites"
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              favorites:
+                type: array
+                items:
+                  type: integer
+        404:
+          description: "Movie not found in favorites"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+              favorites:
+                type: array
+                items:
+                  type: integer
+        500:
+          description: "Internal server error"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+
+  /movies/favorites:
+    get:
+      tags:
+        - Movies
+      summary: "Get a list of all favorite movies"
+      responses:
+        200:
+          description: "List of favorite movies"
+          schema:
+            type: object
+            properties:
+              favorites:
+                type: array
+                items:
+                  type: integer
+        404:
+          description: "No favorites found"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string
+        500:
+          description: "Internal server error"
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              message:
+                type: string

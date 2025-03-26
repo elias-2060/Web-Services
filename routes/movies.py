@@ -12,48 +12,6 @@ class RandomMovies(Resource):
     @cache.cached(timeout=300, query_string=True)  # Cache based on query parameters
     @limiter.limit(RATE_LIMITS["random_movies"])  # Max 10 requests per minute
     def get(self):
-        """
-        Get a list of random movies
-        ---
-        tags:
-          - Movies
-        parameters:
-          - name: n
-            in: query
-            type: integer
-            required: true
-            description: Number of random movies to list (1-20)
-        responses:
-          200:
-            description: A list of random movies
-            schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  title:
-                    type: string
-                  vote_average:
-                    type: number
-          400:
-            description: Invalid parameter value
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-          500:
-            description: Internal server error when fetching movies
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-        """
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
@@ -95,57 +53,6 @@ class PopularMovies(Resource):
     @cache.cached(timeout=300, query_string=True)  # Cache based on query parameters
     @limiter.limit(RATE_LIMITS["popular_movies"])  # Max 10 requests per minute
     def get(self):
-        """
-        Get a list of popular movies
-        ---
-        tags:
-          - Movies
-        parameters:
-          - name: n
-            in: query
-            type: integer
-            required: true
-            description: Number of movies to list (1-20)
-        responses:
-          200:
-            description: A list of popular movies
-            schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  title:
-                    type: string
-                  vote_average:
-                    type: number
-          400:
-            description: Invalid parameter value
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-          404:
-            description: No popular movies found
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-          500:
-            description: Internal server error
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-        """
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
@@ -181,59 +88,6 @@ class SimilarGenres(Resource):
     @cache.cached(timeout=300)  # Cache for 5 minutes
     @limiter.limit(RATE_LIMITS["similar_genres"])  # Max 5 requests per minute
     def get(self, movie_id):
-        """
-        Get movies with similar genres to a specific movie
-        ---
-        tags:
-          - Movies
-        parameters:
-          - name: movie_id
-            in: path
-            type: integer
-            required: true
-            description: The movie ID to search for similar genres
-        responses:
-          200:
-            description: A list of movies with similar genres
-            schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  title:
-                    type: string
-                  genre_ids:
-                    type: array
-                    items:
-                      type: integer
-          400:
-            description: Invalid movie ID or no genres found
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-          404:
-            description: Movie not found
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-          500:
-            description: Internal server error
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-        """
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
@@ -279,57 +133,6 @@ class SimilarRuntime(Resource):
     @cache.cached(timeout=300)  # Cache for 5 minutes
     @limiter.limit(RATE_LIMITS["similar_runtime"])  # Max 5 requests per minute
     def get(self, movie_id):
-        """
-        Get movies with similar runtime to a specific movie
-        ---
-        tags:
-          - Movies
-        parameters:
-          - name: movie_id
-            in: path
-            type: integer
-            required: true
-            description: The movie ID to search for similar runtime
-        responses:
-          200:
-            description: A list of movies with similar runtime
-            schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  title:
-                    type: string
-                  runtime:
-                    type: integer
-          400:
-            description: Invalid movie ID or runtime not found
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-          404:
-            description: Movie not found
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-          500:
-            description: Internal server error
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-        """
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
@@ -376,62 +179,6 @@ class MovieComparison(Resource):
     @cache.cached(timeout=600)  # Cache for 10 minutes
     @limiter.limit(RATE_LIMITS["movie_comparison"])  # Max 3 requests per minute
     def post(self):
-        """
-        Generate a comparison chart for movies based on their scores
-        ---
-        tags:
-          - Movies
-        parameters:
-          - name: body
-            in: body
-            required: true
-            schema:
-              type: object
-              properties:
-                movie_ids:
-                  type: array
-                  items:
-                    type: integer
-        responses:
-          200:
-            description: URL of the generated chart
-            schema:
-              type: object
-              properties:
-                chart_url:
-                  type: string
-          400:
-            description: Invalid request or no movie IDs provided
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-          404:
-            description: One or more movies not found
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-                not_found_ids:
-                  type: array
-                  items:
-                    type: integer
-          500:
-            description: Internal server error
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-        """
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
@@ -500,72 +247,6 @@ favorites = []
 class FavoriteMovies(Resource):
     @limiter.limit(RATE_LIMITS["favorites"])
     def post(self, movie_id):
-        """
-        Add a movie to favorites
-        ---
-        tags:
-          - Movies
-        parameters:
-          - name: movie_id
-            in: path
-            type: integer
-            required: true
-            description: The movie ID to add to favorites
-        responses:
-          200:
-            description: Movie added to favorites
-            schema:
-              type: object
-              properties:
-                message:
-                  type: string
-                favorites:
-                  type: array
-                  items:
-                    type: integer
-          201:
-            description: Movie successfully added to favorites
-            schema:
-              type: object
-              properties:
-                message:
-                  type: string
-                favorites:
-                  type: array
-                  items:
-                    type: integer
-          400:
-            description: Movie already in favorites (no action taken)
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-                favorites:
-                  type: array
-                  items:
-                    type: integer
-          404:
-            description: Movie not found
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-          500:
-            description: Internal server error
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-        """
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
@@ -591,7 +272,7 @@ class FavoriteMovies(Resource):
             return {
                 "message": f"Movie with ID {movie_id} successfully added to favorites",
                 "favorites": favorites
-            }, 201
+            }, 200
         except Exception as e:
             return {
                 "error": "server_error",
@@ -600,63 +281,6 @@ class FavoriteMovies(Resource):
 
     @limiter.limit("5 per minute")
     def delete(self, movie_id):
-        """
-        Remove a movie from favorites
-        ---
-        tags:
-          - Movies
-        parameters:
-          - name: movie_id
-            in: path
-            type: integer
-            required: true
-            description: The movie ID to remove from favorites
-        responses:
-          200:
-            description: Movie removed from favorites
-            schema:
-              type: object
-              properties:
-                message:
-                  type: string
-                favorites:
-                  type: array
-                  items:
-                    type: integer
-          204:
-            description: Movie not in favorites (no action taken)
-            schema:
-              type: object
-              properties:
-                message:
-                  type: string
-                favorites:
-                  type: array
-                  items:
-                    type: integer
-          404:
-            description: Movie not found in favorites
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-                favorites:
-                  type: array
-                  items:
-                    type: integer
-          500:
-            description: Internal server error
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-        """
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
@@ -683,40 +307,6 @@ class FavoriteMovies(Resource):
 
     @limiter.limit("5 per minute")
     def get(self):
-        """
-        Get a list of all favorite movies
-        ---
-        tags:
-          - Movies
-        responses:
-          200:
-            description: List of favorite movies
-            schema:
-              type: object
-              properties:
-                favorites:
-                  type: array
-                  items:
-                    type: integer
-          404:
-            description: No favorites found
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-          500:
-            description: Internal server error
-            schema:
-              type: object
-              properties:
-                error:
-                  type: string
-                message:
-                  type: string
-        """
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:

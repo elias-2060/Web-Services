@@ -1,4 +1,5 @@
 import os
+import yaml
 from flask import Flask
 from flask_restful import Api
 from flasgger import Swagger
@@ -6,9 +7,16 @@ from flask_caching import Cache
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+# Initialize Flask app
 app = Flask(__name__)
 api = Api(app)
-swagger = Swagger(app)
+
+# Load Swagger documentation from an external YAML file
+with open("swagger_docs.yml", "r") as file:
+    swagger_template = yaml.safe_load(file)
+
+# Initialize Swagger with external documentation
+swagger = Swagger(app, template=swagger_template)
 
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "2801197321e5eb6e35677a074ae45024")
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
@@ -28,7 +36,7 @@ limiter = Limiter(
     default_limits=["100 per hour"]  # Default: 100 requests per hour per IP
 )
 
-# Initialize the rate limits
+# Initialize the rare li
 RATE_LIMITS = {
     "default": "100 per hour",
     "random_movies": "10 per minute",

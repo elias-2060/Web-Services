@@ -2,7 +2,8 @@ import secrets
 from flask import request
 
 # Dictionary to store API keys and associated users
-VALID_API_KEYS = []
+VALID_API_KEYS = ["7d6cbb373fde3004e19b40f41b77fd05ab3c4ebbdb8c38debab8dc204d1f217b",
+                  "253e728f5c3233a96b9f34987abba31bfc76cd40ff32f4e63cc901ee16b768e4"]
 
 
 def generate_api_key():

@@ -12,8 +12,8 @@ api.add_resource(FavoriteMovies, "/movies/favorites", "/movies/favorites/<int:mo
 
 if __name__ == '__main__':
     # Generate an api key first so that we can access our endpoints
-    new_key = generate_api_key()
-    print(new_key)
+    # new_key = generate_api_key()
+    # print(new_key)
 
     # Run the API
     app.run(debug=True)
