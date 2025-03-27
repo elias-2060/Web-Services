@@ -8,10 +8,10 @@ securityDefinitions:
   ApiKeyAuth:
     type: apiKey
     in: header
-    name: api-key  # The header name where the API key is sent
+    name: api-key
 
 security:
-  - ApiKeyAuth: []  # Applying the API key authentication globally
+  - ApiKeyAuth: []
 
 paths:
   /movies:
@@ -33,30 +33,15 @@ paths:
           schema:
             type: array
             items:
-              type: object
-              properties:
-                title:
-                  type: string
-                vote_average:
-                  type: number
+              $ref: "#/definitions/Movie"
         400:
           description: "Invalid parameter value"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
         500:
           description: "Internal server error when fetching movies"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
 
   /movies/popular:
     get:
@@ -77,39 +62,19 @@ paths:
           schema:
             type: array
             items:
-              type: object
-              properties:
-                title:
-                  type: string
-                vote_average:
-                  type: number
+              $ref: "#/definitions/Movie"
         400:
           description: "Invalid parameter value"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
         404:
           description: "No popular movies found"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
         500:
           description: "Internal server error"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
 
   /movies/{movie_id}/similar-genres:
     get:
@@ -128,41 +93,19 @@ paths:
           schema:
             type: array
             items:
-              type: object
-              properties:
-                title:
-                  type: string
-                genre_ids:
-                  type: array
-                  items:
-                    type: integer
+              $ref: "#/definitions/Movie"
         400:
           description: "Invalid movie ID or no genres found"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
         404:
           description: "Movie not found"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
         500:
           description: "Internal server error"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
 
   /movies/{movie_id}/similar-runtime:
     get:
@@ -181,39 +124,19 @@ paths:
           schema:
             type: array
             items:
-              type: object
-              properties:
-                title:
-                  type: string
-                runtime:
-                  type: integer
+              $ref: "#/definitions/Movie"
         400:
           description: "Invalid movie ID or runtime not found"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
         404:
           description: "Movie not found"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
         500:
           description: "Internal server error"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
 
   /movies/compare:
     post:
@@ -242,12 +165,7 @@ paths:
         400:
           description: "Invalid request or no movie IDs provided"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
         404:
           description: "One or more movies not found"
           schema:
@@ -264,12 +182,7 @@ paths:
         500:
           description: "Internal server error"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
 
   /movies/favorites/{movie_id}:
     post:
@@ -293,9 +206,9 @@ paths:
               favorites:
                 type: array
                 items:
-                  type: integer
+                  $ref: "#/definitions/Movie"
         400:
-          description: "Movie already in favorites (no action taken)"
+          description: "Movie already in favorites"
           schema:
             type: object
             properties:
@@ -306,25 +219,15 @@ paths:
               favorites:
                 type: array
                 items:
-                  type: integer
+                  $ref: "#/definitions/Movie"
         404:
           description: "Movie not found"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
         500:
           description: "Internal server error"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
 
     delete:
       tags:
@@ -347,7 +250,7 @@ paths:
               favorites:
                 type: array
                 items:
-                  type: integer
+                  $ref: "#/definitions/Movie"
         404:
           description: "Movie not found in favorites"
           schema:
@@ -360,16 +263,11 @@ paths:
               favorites:
                 type: array
                 items:
-                  type: integer
+                  $ref: "#/definitions/Movie"
         500:
           description: "Internal server error"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
 
   /movies/favorites:
     get:
@@ -380,27 +278,58 @@ paths:
         200:
           description: "List of favorite movies"
           schema:
-            type: object
-            properties:
-              favorites:
-                type: array
-                items:
-                  type: integer
+            type: array
+            items:
+              $ref: "#/definitions/Movie"
         404:
           description: "No favorites found"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
         500:
           description: "Internal server error"
           schema:
-            type: object
-            properties:
-              error:
-                type: string
-              message:
-                type: string
+            $ref: "#/definitions/Error"
+
+definitions:
+  Movie:
+    type: object
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      overview:
+        type: string
+      poster_path:
+        type: string
+      backdrop_path:
+        type: string
+      vote_average:
+        type: number
+      vote_count:
+        type: integer
+      release_date:
+        type: string
+      runtime:
+        type: integer
+      genres:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+      genre_ids:
+        type: array
+        items:
+          type: integer
+
+  Error:
+    type: object
+    properties:
+      error:
+        type: string
+      message:
+        type: string

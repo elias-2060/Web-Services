@@ -261,16 +261,20 @@ class FavoriteMovies(Resource):
                     "message": f"Movie with ID {movie_id} not found"
                 }, 404
 
-            if movie_id in favorites:
+            # Check if movie already favorited
+            if any(movie['id'] == movie_id for movie in favorites):
                 return {
                     "error": "movie_already_favorited",
                     "message": f"Movie with ID {movie_id} is already in favorites",
                     "favorites": favorites
                 }, 400
 
-            favorites.append(movie_id)
+            # Add full movie details to favorites
+            movie_data = response.json()
+            favorites.append(movie_data)
+
             return {
-                "message": f"Movie with ID {movie_id} successfully added to favorites",
+                "message": f"Movie '{movie_data.get('title')}' successfully added to favorites",
                 "favorites": favorites
             }, 200
         except Exception as e:
@@ -287,16 +291,19 @@ class FavoriteMovies(Resource):
             return auth_error
 
         try:
-            if movie_id not in favorites:
+            # Find the movie in favorites
+            movie_to_remove = next((movie for movie in favorites if movie['id'] == movie_id), None)
+
+            if not movie_to_remove:
                 return {
                     "error": "movie_not_in_favorites",
                     "message": f"Movie with ID {movie_id} not found in favorites",
                     "favorites": favorites
                 }, 404
 
-            favorites.remove(movie_id)
+            favorites.remove(movie_to_remove)
             return {
-                "message": f"Movie with ID {movie_id} removed from favorites",
+                "message": f"Movie '{movie_to_remove.get('title')}' removed from favorites",
                 "favorites": favorites
             }, 200
         except Exception as e:
@@ -319,7 +326,7 @@ class FavoriteMovies(Resource):
                     "message": "No favorite movies found"
                 }, 404
 
-            return {"favorites": favorites}
+            return jsonify(favorites)
         except Exception as e:
             return {
                 "error": "server_error",

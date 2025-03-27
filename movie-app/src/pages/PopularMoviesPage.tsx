@@ -7,7 +7,7 @@ const PopularMoviesPage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [count, setCount] = useState(12); // Default to 12 movies
+  const [count, setCount] = useState(20); // Default to 20 movies
 
   useEffect(() => {
     const loadMovies = async () => {

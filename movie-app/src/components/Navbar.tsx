@@ -11,11 +11,14 @@ const Navbar: React.FC = () => {
           </Link>
 
           <div className="flex space-x-6">
-            <Link to="/random" className="hover:text-blue-200">
-              Random Movies
-            </Link>
             <Link to="/popular" className="hover:text-blue-200">
               Popular Movies
+            </Link>
+            <Link to="/similar-genres" className="hover:text-blue-200">
+              Similar Genres
+            </Link>
+            <Link to="/similar-runtime" className="hover:text-blue-200">
+              Similar Runtime
             </Link>
             <Link to="/favorites" className="hover:text-blue-200">
               My Favorites

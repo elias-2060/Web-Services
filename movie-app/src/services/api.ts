@@ -62,9 +62,8 @@ export const fetchSimilarRuntime = async (movieId: number): Promise<Movie[]> => 
 };
 
 // Favorites
-export const fetchFavorites = async (): Promise<number[]> => {
-  const response = await apiRequest<{ favorites: number[] }>('/movies/favorites');
-  return response.favorites;
+export const fetchFavorites = async (): Promise<Movie[]> => {
+  return apiRequest(`/movies/favorites`);
 };
 
 export const addFavorite = async (movieId: number): Promise<FavoriteActionResponse> => {
