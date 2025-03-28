@@ -5,16 +5,14 @@ import { Movie } from '../types/movie';
 interface MovieListProps {
   movies: Movie[];
   favorites?: number[];
-  onAddFavorite?: (id: number) => void;
-  onRemoveFavorite?: (id: number) => void;
+  onFavoriteUpdate?: () => void;
   showDetails?: boolean;
 }
 
 const MovieList: React.FC<MovieListProps> = ({
   movies,
   favorites = [],
-  onAddFavorite,
-  onRemoveFavorite,
+  onFavoriteUpdate,
   showDetails = false,
 }) => {
   return (
@@ -24,8 +22,7 @@ const MovieList: React.FC<MovieListProps> = ({
           key={movie.id}
           movie={movie}
           isFavorite={favorites.includes(movie.id)}
-          onAddFavorite={onAddFavorite}
-          onRemoveFavorite={onRemoveFavorite}
+          onFavoriteUpdate={onFavoriteUpdate}
           showDetails={showDetails}
         />
       ))}

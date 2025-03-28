@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { fetchSimilarRuntime } from '../services/api';
+import { fetchSimilarRuntime, fetchFavorites } from '../services/api';
 import MovieList from '../components/MovieList';
 import { Movie } from '../types/movie';
 
 const SimilarRuntimePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [favorites, setFavorites] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [movieId, setMovieId] = useState<string>('');
   const [submittedId, setSubmittedId] = useState<number | null>(null);
   const [count, setCount] = useState(20);
+  const [favoritesError, setFavoritesError] = useState<string | null>(null);
 
   // Remember the previous typed movie id when we refresh the page
   useEffect(() => {
@@ -31,6 +33,17 @@ const SimilarRuntimePage: React.FC = () => {
     }
   };
 
+  const refreshFavorites = async () => {
+    try {
+      const favoriteMovies = await fetchFavorites();
+      setFavorites(favoriteMovies.map(movie => movie.id));
+      setFavoritesError(null);
+    } catch (err) {
+      console.error('Failed to refresh favorites:', err);
+      setFavoritesError('Failed to update favorites. Please try again.');
+    }
+  };
+
   useEffect(() => {
     if (submittedId === null) return;
 
@@ -38,8 +51,19 @@ const SimilarRuntimePage: React.FC = () => {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await fetchSimilarRuntime(submittedId);
+        setFavoritesError(null);
+
+        const [data, favoriteMovies] = await Promise.all([
+          fetchSimilarRuntime(submittedId),
+          fetchFavorites().catch(err => {
+            console.error('Failed to load favorites:', err);
+            setFavoritesError('Failed to load favorites. You may need to refresh.');
+            return [];
+          })
+        ]);
+
         setMovies(data.slice(0, count));
+        setFavorites(favoriteMovies.map(movie => movie.id));
       } catch (err) {
         setError('Failed to load similar movies. Please check the movie ID and try again.');
         console.error(err);
@@ -98,6 +122,13 @@ const SimilarRuntimePage: React.FC = () => {
         )}
       </div>
 
+      {favoritesError && (
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4" role="alert">
+          <strong className="font-bold">Note:</strong>
+          <span className="block sm:inline"> {favoritesError}</span>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="mb-8">
         <div className="flex items-center">
           <label htmlFor="movieId" className="mr-2">
@@ -145,7 +176,12 @@ const SimilarRuntimePage: React.FC = () => {
         </div>
       )}
 
-      <MovieList movies={movies} />
+      <MovieList
+        movies={movies}
+        favorites={favorites}
+        onFavoriteUpdate={refreshFavorites}
+        showDetails={true}
+      />
 
       {submittedId && movies.length === 0 && !isLoading && (
         <div className="text-center py-12">

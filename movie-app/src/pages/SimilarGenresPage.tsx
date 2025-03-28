@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { fetchSimilarGenres } from '../services/api';
+import { fetchSimilarGenres, fetchFavorites } from '../services/api';
 import MovieList from '../components/MovieList';
 import { Movie } from '../types/movie';
 
 const SimilarGenresPage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [favorites, setFavorites] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [movieId, setMovieId] = useState<string>('');
   const [submittedId, setSubmittedId] = useState<number | null>(null);
   const [count, setCount] = useState(20);
+  const [favoritesError, setFavoritesError] = useState<string | null>(null);
 
   // Remember the previous typed movie id when we refresh the page
   useEffect(() => {
@@ -25,10 +27,20 @@ const SimilarGenresPage: React.FC = () => {
     const id = parseInt(movieId);
     if (!isNaN(id) && id > 0) {
       setSubmittedId(id);
-      // Save to localStorage with a unique key for this page
       localStorage.setItem('lastSimilarGenresMovieId', id.toString());
     } else {
       setError('Please enter a valid movie ID (positive number)');
+    }
+  };
+
+  const refreshFavorites = async () => {
+    try {
+      const favoriteMovies = await fetchFavorites();
+      setFavorites(favoriteMovies.map(movie => movie.id));
+      setFavoritesError(null);
+    } catch (err) {
+      console.error('Failed to refresh favorites:', err);
+      setFavoritesError('Failed to update favorites. Please try again.');
     }
   };
 
@@ -39,8 +51,19 @@ const SimilarGenresPage: React.FC = () => {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await fetchSimilarGenres(submittedId);
+        setFavoritesError(null);
+
+        const [data, favoriteMovies] = await Promise.all([
+          fetchSimilarGenres(submittedId),
+          fetchFavorites().catch(err => {
+            console.error('Failed to load favorites:', err);
+            setFavoritesError('Failed to load favorites. You may need to refresh.');
+            return [];
+          })
+        ]);
+
         setMovies(data.slice(0, count));
+        setFavorites(favoriteMovies.map(movie => movie.id));
       } catch (err) {
         setError('Failed to load similar movies. Please check the movie ID and try again.');
         console.error(err);
@@ -52,7 +75,30 @@ const SimilarGenresPage: React.FC = () => {
     loadMovies();
   }, [submittedId, count]);
 
-  // ... [keep all the existing JSX the same, but add the Clear button as shown below]
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Error!</strong>
+          <span className="block sm:inline"> {error}</span>
+        </div>
+        <button
+          onClick={() => setError(null)}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -75,6 +121,13 @@ const SimilarGenresPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {favoritesError && (
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4" role="alert">
+          <strong className="font-bold">Note:</strong>
+          <span className="block sm:inline"> {favoritesError}</span>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="mb-8">
         <div className="flex items-center">
@@ -123,7 +176,12 @@ const SimilarGenresPage: React.FC = () => {
         </div>
       )}
 
-      <MovieList movies={movies} />
+      <MovieList
+        movies={movies}
+        favorites={favorites}
+        onFavoriteUpdate={refreshFavorites}
+        showDetails={true}
+      />
 
       {submittedId && movies.length === 0 && !isLoading && (
         <div className="text-center py-12">

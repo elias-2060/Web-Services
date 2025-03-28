@@ -44,5 +44,5 @@ RATE_LIMITS = {
     "similar_genres": "5 per minute",
     "similar_runtime": "5 per minute",
     "movie_comparison": "3 per minute",
-    "favorites": "5 per minute"
+    "favorites": "100 per minute"
 }

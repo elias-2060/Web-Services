@@ -283,7 +283,7 @@ class FavoriteMovies(Resource):
                 "message": f"An error occurred while adding to favorites: {str(e)}"
             }, 500
 
-    @limiter.limit("5 per minute")
+    @limiter.limit(RATE_LIMITS["favorites"])
     def delete(self, movie_id):
         # Verify API Key
         auth_error = verify_api_key()
@@ -312,7 +312,7 @@ class FavoriteMovies(Resource):
                 "message": f"An error occurred while removing from favorites: {str(e)}"
             }, 500
 
-    @limiter.limit("5 per minute")
+    @limiter.limit(RATE_LIMITS["favorites"])
     def get(self):
         # Verify API Key
         auth_error = verify_api_key()

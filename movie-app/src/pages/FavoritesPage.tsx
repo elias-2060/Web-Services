@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchFavorites, removeFavorite } from '../services/api';
+import { fetchFavorites } from '../services/api';
 import MovieList from '../components/MovieList';
 import { Movie } from '../types/movie';
 
@@ -8,34 +8,25 @@ const FavoritesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load favorites
-  useEffect(() => {
-    const loadFavorites = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const favorites = await fetchFavorites();
-        setFavoriteMovies(favorites);
-      } catch (err) {
+  const loadFavorites = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const favorites = await fetchFavorites();
+      setFavoriteMovies(favorites);
+    } catch (err: any) {
+      if (err.response?.status === 500) {
         setError('Failed to load favorites');
         console.error(err);
-      } finally {
-        setIsLoading(false);
       }
-    };
-
-    loadFavorites();
-  }, []);
-
-  const handleRemoveFavorite = async (movieId: number) => {
-    try {
-      await removeFavorite(movieId);
-      setFavoriteMovies(prev => prev.filter(movie => movie.id !== movieId));
-    } catch (err) {
-      setError('Failed to remove favorite');
-      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadFavorites();
+  }, []);
 
   if (isLoading) {
     return (
@@ -81,7 +72,9 @@ const FavoritesPage: React.FC = () => {
       ) : (
         <MovieList
           movies={favoriteMovies}
-          onRemoveFavorite={handleRemoveFavorite}
+          favorites={favoriteMovies.map(movie => movie.id)}
+          onFavoriteUpdate={loadFavorites}
+          showDetails={true}
         />
       )}
     </div>
