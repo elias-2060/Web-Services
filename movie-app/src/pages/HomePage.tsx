@@ -108,7 +108,6 @@ const HomePage: React.FC = () => {
         movies={movies}
         favorites={favorites}
         onFavoriteUpdate={refreshFavorites}
-        showDetails={true}
       />
 
       <div className="mt-12">

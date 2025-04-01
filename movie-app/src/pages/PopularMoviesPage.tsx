@@ -107,7 +107,6 @@ const PopularMoviesPage: React.FC = () => {
         movies={movies}
         favorites={favorites}
         onFavoriteUpdate={refreshFavorites}
-        showDetails={true}
       />
 
       {movies.length === 0 && (

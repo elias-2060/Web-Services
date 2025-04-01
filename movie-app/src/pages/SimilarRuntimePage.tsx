@@ -180,7 +180,6 @@ const SimilarRuntimePage: React.FC = () => {
         movies={movies}
         favorites={favorites}
         onFavoriteUpdate={refreshFavorites}
-        showDetails={true}
       />
 
       {submittedId && movies.length === 0 && !isLoading && (

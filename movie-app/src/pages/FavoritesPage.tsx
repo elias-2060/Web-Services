@@ -74,7 +74,6 @@ const FavoritesPage: React.FC = () => {
           movies={favoriteMovies}
           favorites={favoriteMovies.map(movie => movie.id)}
           onFavoriteUpdate={loadFavorites}
-          showDetails={true}
         />
       )}
     </div>

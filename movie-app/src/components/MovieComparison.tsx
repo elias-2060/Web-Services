@@ -41,7 +41,7 @@ const MovieComparison: React.FC<MovieComparisonProps> = ({
       <h2 className="text-xl font-bold mb-4">Compare Selected Movies</h2>
 
       <div className="mb-4">
-        <MovieList movies={selectedMovies} showDetails={true} />
+        <MovieList movies={selectedMovies} />
       </div>
 
       <div className="flex space-x-4 mb-4">
