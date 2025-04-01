@@ -1,7 +1,7 @@
 import { Movie, FavoriteActionResponse } from '../types/movie';
 
-const API_BASE_URL = 'http://127.0.0.1:5000'; // Update if your API is hosted elsewhere
-const API_KEY = '7d6cbb373fde3004e19b40f41b77fd05ab3c4ebbdb8c38debab8dc204d1f217b';
+const API_BASE_URL = 'http://127.0.0.1:5000';
+const API_KEY = process.env.REACT_APP_API_KEY; // Now from environment variable
 
 interface ErrorResponse {
   error?: string;
@@ -9,33 +9,49 @@ interface ErrorResponse {
   status_code?: number;
 }
 
-// Generic request handler
+// Throw error if API key is missing at runtime
+if (!API_KEY) {
+  throw new Error(
+    'API key is missing. Ensure you:\n' +
+    '1. Started the API with ./run_api.sh\n' +
+    '2. Are running the frontend with ./start_frontend.sh\n' +
+    '3. Have REACT_APP_API_KEY in your .env file for development'
+  );
+}
+
+// Enhanced request handler with key validation
 const apiRequest = async <T>(endpoint: string, options: RequestInit = {}): Promise<T> => {
-  // Create new Headers object to ensure immutability
+  if (!API_KEY) {
+    throw new Error('API key not available');
+  }
+
   const headers = new Headers({
     'Content-Type': 'application/json',
-    'API-Key': API_KEY, // Case-sensitive header name
-    ...options.headers, // Merge with any custom headers
+    'API-Key': API_KEY,
+    ...options.headers,
   });
 
-  // Create new request options
   const requestOptions: RequestInit = {
     ...options,
     headers,
-    mode: 'cors', // Ensure CORS mode
+    mode: 'cors',
   };
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, requestOptions);
-    console.log("test", response)
+
     if (!response.ok) {
-      const errorData: ErrorResponse = await response.json();
-      throw new Error(errorData.error || errorData.message || 'API request failed');
+      const errorData: ErrorResponse = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.error ||
+        errorData.message ||
+        `API request failed with status ${response.status}`
+      );
     }
 
     return await response.json() as T;
   } catch (error) {
-    console.error(`API request failed for ${endpoint}:`, error);
+    console.error(`API request to ${endpoint} failed:`, error);
     throw error;
   }
 };

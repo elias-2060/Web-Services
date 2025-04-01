@@ -52,6 +52,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
             onClick={handleFavoriteClick}
             className="absolute top-3 right-3 p-2 bg-black bg-opacity-50 rounded-full z-10 hover:bg-opacity-70 transition-all"
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

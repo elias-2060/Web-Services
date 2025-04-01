@@ -1,18 +1,38 @@
 #!/bin/bash
 
-# Check if the API is running
-if ! pgrep -f "app.py" > /dev/null; then
-    echo "API is not running. Please start the API first with run_api.sh"
+# 1. Activate virtual environment
+source venv/bin/activate
+
+# 2. Check if API is responding
+if ! curl -s http://127.0.0.1:5000/movies >/dev/null; then
+    echo "API not responding at http://127.0.0.1:5000"
+    echo "Note: Make sure to run ./run_api.sh first"
     exit 1
 fi
 
-# Get the API key from the running process
-API_KEY=$(ps aux | grep "app.py --api-key" | grep -v grep | awk -F '--api-key ' '{print $2}' | awk '{print $1}')
+# Get current key (with verification)
+API_KEY=$(python3 -c "
+try:
+    from utils import get_api_key
+    key = get_api_key()
+    if not key:
+        print('ERROR: No API key found', file=sys.stderr)
+        exit(1)
+    print(key)
+except Exception as e:
+    print(f'ERROR: {str(e)}', file=sys.stderr)
+    exit(1)
+" 2> api_key_error.txt)
+
+if [ $? -ne 0 ]; then
+    cat api_key_error.txt
+    exit 1
+fi
 
 if [ -z "$API_KEY" ]; then
-    echo "Could not find API key. Is the API running?"
+    echo "ERROR: Got empty API key"
     exit 1
 fi
 
-echo "Running tests with API key: $API_KEY"
+echo "Running tests with key: $API_KEY"
 python3 consume_api.py --api-key "$API_KEY"

@@ -1,7 +1,17 @@
 #!/bin/bash
 
-# Generate a new API key
+# Create and activate venv if it doesn't exist
+if [ ! -d "venv" ]; then
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+else
+    source venv/bin/activate
+fi
+
+# Generate new key (overwrites any existing)
 API_KEY=$(python3 -c "from utils import generate_api_key; print(generate_api_key())")
 
-echo "Starting API with generated API key: $API_KEY"
+echo "Starting API with key: $API_KEY"
+echo "This is the ONLY valid key now"
 python3 app.py --api-key "$API_KEY"
