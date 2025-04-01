@@ -6,6 +6,7 @@ import PopularMoviesPage from './pages/PopularMoviesPage';
 import FavoritesPage from './pages/FavoritesPage';
 import SimilarGenresPage from "./pages/SimilarGenresPage";
 import SimilarRuntimePage from "./pages/SimilarRuntimePage";
+import CompareMoviesPage from "./pages/CompareMoviesPage";
 
 const App: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const App: React.FC = () => {
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/similar-genres" element={<SimilarGenresPage/>} />
             <Route path="/similar-runtime" element={<SimilarRuntimePage/>} />
+            <Route path="/compare" element={<CompareMoviesPage/>} />
           </Routes>
         </div>
       </div>

@@ -36,13 +36,13 @@ limiter = Limiter(
     default_limits=["100 per hour"]  # Default: 100 requests per hour per IP
 )
 
-# Initialize the rare li
+# Initialize the rare limits
 RATE_LIMITS = {
     "default": "100 per hour",
     "random_movies": "10 per minute",
     "popular_movies": "10 per minute",
-    "similar_genres": "5 per minute",
-    "similar_runtime": "5 per minute",
-    "movie_comparison": "3 per minute",
+    "similar_genres": "100 per minute",
+    "similar_runtime": "100 per minute",
+    "movie_comparison": "100 per minute",
     "favorites": "100 per minute"
 }

@@ -10,7 +10,7 @@ import json
 # Endpoint to list random movies
 class RandomMovies(Resource):
     @cache.cached(timeout=300, query_string=True)  # Cache based on query parameters
-    @limiter.limit(RATE_LIMITS["random_movies"])  # Max 10 requests per minute
+    @limiter.limit(RATE_LIMITS["random_movies"])
     def get(self):
         # Verify API Key
         auth_error = verify_api_key()
@@ -85,7 +85,7 @@ class PopularMovies(Resource):
 
 # Endpoint to find movies with similar genres
 class SimilarGenres(Resource):
-    @cache.cached(timeout=300)  # Cache for 5 minutes
+    @cache.cached(timeout=300, key_prefix=lambda: f"genres_{request.view_args.get('movie_id')}")  # Cache based on movie_id
     @limiter.limit(RATE_LIMITS["similar_genres"])  # Max 5 requests per minute
     def get(self, movie_id):
         # Verify API Key
@@ -130,8 +130,8 @@ class SimilarGenres(Resource):
 
 # Endpoint to find movies with a similar runtime
 class SimilarRuntime(Resource):
-    @cache.cached(timeout=300)  # Cache for 5 minutes
-    @limiter.limit(RATE_LIMITS["similar_runtime"])  # Max 5 requests per minute
+    @cache.cached(timeout=300, key_prefix=lambda: f"runtime_{request.view_args.get('movie_id')}")  # Cache based on movie_id
+    @limiter.limit(RATE_LIMITS["similar_runtime"])
     def get(self, movie_id):
         # Verify API Key
         auth_error = verify_api_key()
@@ -176,8 +176,8 @@ class SimilarRuntime(Resource):
 
 # Endpoint to generate a bar plot comparing movie scores
 class MovieComparison(Resource):
-    @cache.cached(timeout=600)  # Cache for 10 minutes
-    @limiter.limit(RATE_LIMITS["movie_comparison"])  # Max 3 requests per minute
+    @cache.cached(timeout=600, key_prefix=lambda: str(request.json.get('movie_ids', [])))  # Cache based on movie_ids
+    @limiter.limit(RATE_LIMITS["movie_comparison"])
     def post(self):
         # Verify API Key
         auth_error = verify_api_key()
@@ -228,7 +228,7 @@ class MovieComparison(Resource):
                 "type": "bar",
                 "data": {
                     "labels": [m["title"] for m in movie_data],
-                    "datasets": [{"label": "Score", "data": [m["score"] for m in movie_data]}],
+                    "datasets": [{"label": "Average score", "data": [m["score"] for m in movie_data]}],
                 },
             }
             chart_url = f"{QUICKCHART_BASE_URL}?c={json.dumps(chart_data)}"

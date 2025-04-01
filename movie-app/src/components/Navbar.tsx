@@ -20,6 +20,9 @@ const Navbar: React.FC = () => {
             <Link to="/similar-runtime" className="hover:text-blue-200">
               Similar Runtime
             </Link>
+            <Link to="/compare" className="hover:text-blue-200">
+              Compare Movies
+            </Link>
             <Link to="/favorites" className="hover:text-blue-200">
               My Favorites
             </Link>
