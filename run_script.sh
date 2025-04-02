@@ -1,10 +1,14 @@
 #!/bin/bash
 
 # 1. Activate virtual environment
-source venv/bin/activate
+if [ -d "venv/Scripts" ]; then
+        source venv/Scripts/activate  # Windows
+    else
+        source venv/bin/activate     # Linux/macOS
+fi
 
 # 2. Check if API is responding
-if ! curl -s http://127.0.0.1:5000/movies >/dev/null; then
+if ! curl -s http://127.0.0.1:5000 >/dev/null; then
     echo "API not responding at http://127.0.0.1:5000"
     echo "Note: Make sure to run ./run_api.sh first"
     exit 1

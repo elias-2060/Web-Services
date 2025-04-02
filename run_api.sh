@@ -3,10 +3,20 @@
 # Create and activate venv if it doesn't exist
 if [ ! -d "venv" ]; then
     python3 -m venv venv
-    source venv/bin/activate
+    # activate the venv
+    if [ -d "venv/Scripts" ]; then
+        source venv/Scripts/activate  # Windows
+    else
+        source venv/bin/activate     # Linux/macOS
+    fi
+
     pip install -r requirements.txt
 else
-    source venv/bin/activate
+    if [ -d "venv/Scripts" ]; then
+        source venv/Scripts/activate  # Windows
+    else
+        source venv/bin/activate     # Linux/macOS
+    fi
 fi
 
 # Generate new key (overwrites any existing)
