@@ -8,7 +8,7 @@ securityDefinitions:
   ApiKeyAuth:
     type: apiKey
     in: header
-    name: api-key
+    name: API-Key
 
 security:
   - ApiKeyAuth: []
@@ -38,6 +38,10 @@ paths:
           description: "Invalid parameter value"
           schema:
             $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized - Invalid or missing API key"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal server error when fetching movies"
           schema:
@@ -65,6 +69,10 @@ paths:
               $ref: "#/definitions/Movie"
         400:
           description: "Invalid parameter value"
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized - Invalid or missing API key"
           schema:
             $ref: "#/definitions/Error"
         404:
@@ -98,6 +106,10 @@ paths:
           description: "Invalid movie ID or no genres found"
           schema:
             $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized - Invalid or missing API key"
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "Movie not found"
           schema:
@@ -127,6 +139,10 @@ paths:
               $ref: "#/definitions/Movie"
         400:
           description: "Invalid movie ID or runtime not found"
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized - Invalid or missing API key"
           schema:
             $ref: "#/definitions/Error"
         404:
@@ -164,6 +180,10 @@ paths:
                 type: string
         400:
           description: "Invalid request or no movie IDs provided"
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized - Invalid or missing API key"
           schema:
             $ref: "#/definitions/Error"
         404:
@@ -220,6 +240,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/definitions/Movie"
+        401:
+          description: "Unauthorized - Invalid or missing API key"
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "Movie not found"
           schema:
@@ -251,6 +275,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/definitions/Movie"
+        401:
+          description: "Unauthorized - Invalid or missing API key"
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "Movie not found in favorites"
           schema:
@@ -281,6 +309,10 @@ paths:
             type: array
             items:
               $ref: "#/definitions/Movie"
+        401:
+          description: "Unauthorized - Invalid or missing API key"
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "No favorites found"
           schema:
