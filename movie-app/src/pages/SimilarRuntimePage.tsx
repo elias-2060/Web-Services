@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchSimilarRuntime, fetchFavorites } from '../services/api';
 import MovieList from '../components/MovieList';
 import { Movie } from '../types/movie';
+import { useSearchParams } from 'react-router-dom';
 
 const SimilarRuntimePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -12,15 +13,24 @@ const SimilarRuntimePage: React.FC = () => {
   const [submittedId, setSubmittedId] = useState<number | null>(null);
   const [count, setCount] = useState(20);
   const [favoritesError, setFavoritesError] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
 
-  // Remember the previous typed movie id when we refresh the page
+  // Load movie ID from URL or localStorage
   useEffect(() => {
+    const urlMovieId = searchParams.get('movieId');
+    if (urlMovieId) {
+      setMovieId(urlMovieId);
+      setSubmittedId(Number(urlMovieId));
+      localStorage.setItem('lastSimilarRuntimeMovieId', urlMovieId); // Save URL ID to localStorage
+      return;
+    }
+
     const savedId = localStorage.getItem('lastSimilarRuntimeMovieId');
     if (savedId) {
       setMovieId(savedId);
       setSubmittedId(Number(savedId));
     }
-  }, []);
+  }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

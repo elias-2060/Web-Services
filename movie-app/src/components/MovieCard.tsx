@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MovieCardProps } from '../types/movie';
 import { addFavorite, removeFavorite } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const MovieCard: React.FC<MovieCardProps> = ({
   movie,
@@ -9,6 +10,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [copied, setCopied] = useState(false);
+  const navigate = useNavigate();
   const posterUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
     : 'https://via.placeholder.com/500x750?text=No+Poster';
@@ -38,6 +40,16 @@ const MovieCard: React.FC<MovieCardProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleSimilarGenres = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/similar-genres?movieId=${movie.id}`);
+  };
+
+  const handleSimilarRuntime = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/similar-runtime?movieId=${movie.id}`);
+  };
+
   return (
     <div
       onClick={handleCardClick}
@@ -46,7 +58,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
       <div className={`relative w-full h-full transition-transform duration-500 transform-style-preserve-3d ${
         isFlipped ? 'rotate-y-180' : ''
       }`}>
-        {/* Front of the card (unchanged) */}
+        {/* Front of the card */}
         <div className={`bg-white rounded-lg shadow-md overflow-hidden backface-hidden h-full ${isFlipped ? 'hidden' : ''}`}>
           <button
             onClick={handleFavoriteClick}
@@ -112,7 +124,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
           </div>
         </div>
 
-        {/* Back of the card with new fields */}
+        {/* Back of the card */}
         <div className={`absolute top-0 left-0 w-full h-full bg-white rounded-lg shadow-md p-5 backface-hidden rotate-y-180 ${!isFlipped ? 'hidden' : ''}`}>
           <h3 className="text-xl font-bold mb-3">{movie.title}</h3>
           <p className="text-gray-600 text-sm mb-4 line-clamp-5">{movie.overview}</p>
@@ -174,7 +186,6 @@ const MovieCard: React.FC<MovieCardProps> = ({
               </div>
             </div>
 
-            {/* New: Original Title */}
             {movie.original_title && movie.original_title !== movie.title && (
               <div>
                 <p className="text-gray-500 text-sm font-semibold mb-1">Original Title</p>
@@ -182,7 +193,6 @@ const MovieCard: React.FC<MovieCardProps> = ({
               </div>
             )}
 
-            {/* New: Original Language */}
             {movie.original_language && (
               <div>
                 <p className="text-gray-500 text-sm font-semibold mb-1">Original Language</p>
@@ -191,6 +201,26 @@ const MovieCard: React.FC<MovieCardProps> = ({
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Improved Similar Movies Buttons */}
+          <div className="flex justify-center gap-3 mt-4">
+            <button
+              onClick={handleSimilarGenres}
+              className="flex-1 max-w-[160px] px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white
+                         text-sm font-medium rounded-md shadow-sm hover:shadow-md transition-all
+                         focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+            >
+              Similar Genres
+            </button>
+            <button
+              onClick={handleSimilarRuntime}
+              className="flex-1 max-w-[160px] px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white
+                         text-sm font-medium rounded-md shadow-sm hover:shadow-md transition-all
+                         focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50"
+            >
+              Similar Runtime
+            </button>
           </div>
         </div>
       </div>

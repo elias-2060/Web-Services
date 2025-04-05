@@ -16,6 +16,7 @@ fi
 
 # Get current key (with verification)
 API_KEY=$(python3 -c "
+import sys
 try:
     from utils import get_api_key
     key = get_api_key()
@@ -26,10 +27,10 @@ try:
 except Exception as e:
     print(f'ERROR: {str(e)}', file=sys.stderr)
     exit(1)
-" 2> api_key_error.txt)
+")
 
 if [ $? -ne 0 ]; then
-    cat api_key_error.txt
+    echo "$API_KEY"  # The error message was already sent to stderr
     exit 1
 fi
 
