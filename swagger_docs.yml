@@ -34,6 +34,42 @@ paths:
             type: array
             items:
               $ref: "#/definitions/Movie"
+          examples:
+            application/json:
+              [
+                {
+                  "adult": false,
+                  "backdrop_path": "/1Gf5YdhlJ1G7Tf7WkSRrs6ssZ3G.jpg",
+                  "genre_ids": [99],
+                  "id": 24593,
+                  "original_language": "en",
+                  "original_title": "Thinking XXX",
+                  "overview": "For a book project, photographer Timothy Greenfield-Sanders took photographs of 30 stars of adult movies...",
+                  "popularity": 3.8453,
+                  "poster_path": "/kqB0fF7VlODmw1exH4iDZHGUiVI.jpg",
+                  "release_date": "2004-10-27",
+                  "title": "Thinking XXX",
+                  "video": false,
+                  "vote_average": 5.5,
+                  "vote_count": 99
+                },
+                {
+                  "adult": false,
+                  "backdrop_path": "/lUPz9zW0uf0bHfYsRRID8RtBHEU.jpg",
+                  "genre_ids": [18, 36],
+                  "id": 457232,
+                  "original_language": "en",
+                  "original_title": "Lamborghini: The Man Behind the Legend",
+                  "overview": "Follow the launch of Lamborghini's career as a manufacturer of tractors...",
+                  "popularity": 3.845,
+                  "poster_path": "/RKgnYLhCNGCUkrhiCRrs40rEHe.jpg",
+                  "release_date": "2022-11-17",
+                  "title": "Lamborghini: The Man Behind the Legend",
+                  "video": false,
+                  "vote_average": 6.411,
+                  "vote_count": 619
+                }
+              ]
         400:
           description: "Invalid parameter value"
           schema:
@@ -67,6 +103,26 @@ paths:
             type: array
             items:
               $ref: "#/definitions/Movie"
+          examples:
+            application/json:
+              [
+                {
+                  "adult": false,
+                  "backdrop_path": "/jFDHwsTPrhIbXkPkwJGU3EORmPo.jpg",
+                  "genre_ids": [35, 18, 10752],
+                  "id": 354287,
+                  "original_language": "en",
+                  "original_title": "War Machine",
+                  "overview": "A rock star general bent on winning the 'impossible' war in Afghanistan...",
+                  "popularity": 3.8369,
+                  "poster_path": "/bU2Q2rCH5VFrJNKSyx6wSmQZFsX.jpg",
+                  "release_date": "2017-05-26",
+                  "title": "War Machine",
+                  "video": false,
+                  "vote_average": 5.606,
+                  "vote_count": 1154
+                }
+              ]
         400:
           description: "Invalid parameter value"
           schema:
@@ -102,6 +158,26 @@ paths:
             type: array
             items:
               $ref: "#/definitions/Movie"
+          examples:
+            application/json:
+              [
+                {
+                  "adult": false,
+                  "backdrop_path": "/bxQT6xCjejpGtgKl0QH8WUtrs33.jpg",
+                  "genre_ids": [18, 53],
+                  "id": 7735,
+                  "original_language": "de",
+                  "original_title": "Die Welle",
+                  "overview": "A school teacher discusses types of government with his class...",
+                  "popularity": 3.8421,
+                  "poster_path": "/vtJ4u0fpTZhibxAJHzXtcdCxhsL.jpg",
+                  "release_date": "2008-03-13",
+                  "title": "The Wave",
+                  "video": false,
+                  "vote_average": 7.486,
+                  "vote_count": 3386
+                }
+              ]
         400:
           description: "Invalid movie ID or no genres found"
           schema:
@@ -137,6 +213,26 @@ paths:
             type: array
             items:
               $ref: "#/definitions/Movie"
+          examples:
+            application/json:
+              [
+                {
+                  "adult": false,
+                  "backdrop_path": "/dssCw0mUmD4EriUmkwB3PnsGu4q.jpg",
+                  "genre_ids": [16, 28, 14],
+                  "id": 841755,
+                  "original_language": "en",
+                  "original_title": "Mortal Kombat Legends: Battle of the Realms",
+                  "overview": "The Earthrealm heroes must journey to the Outworld...",
+                  "popularity": 3.8437,
+                  "poster_path": "/ablrE8IbWcIrAxMmm4gnPn75AMS.jpg",
+                  "release_date": "2021-08-30",
+                  "title": "Mortal Kombat Legends: Battle of the Realms",
+                  "video": false,
+                  "vote_average": 7.6,
+                  "vote_count": 447
+                }
+              ]
         400:
           description: "Invalid movie ID or runtime not found"
           schema:
@@ -326,37 +422,54 @@ definitions:
   Movie:
     type: object
     properties:
-      id:
-        type: integer
-      title:
-        type: string
-      overview:
-        type: string
-      poster_path:
-        type: string
+      adult:
+        type: boolean
       backdrop_path:
         type: string
-      vote_average:
-        type: number
-      vote_count:
-        type: integer
-      release_date:
-        type: string
-      runtime:
-        type: integer
-      genres:
-        type: array
-        items:
-          type: object
-          properties:
-            id:
-              type: integer
-            name:
-              type: string
+        nullable: true
       genre_ids:
         type: array
         items:
           type: integer
+      id:
+        type: integer
+      original_language:
+        type: string
+      original_title:
+        type: string
+      overview:
+        type: string
+      popularity:
+        type: number
+      poster_path:
+        type: string
+        nullable: true
+      release_date:
+        type: string
+        format: date
+      title:
+        type: string
+      video:
+        type: boolean
+      vote_average:
+        type: number
+      vote_count:
+        type: integer
+    example:
+      adult: false
+      backdrop_path: "/1Gf5YdhlJ1G7Tf7WkSRrs6ssZ3G.jpg"
+      genre_ids: [99]
+      id: 24593
+      original_language: "en"
+      original_title: "Thinking XXX"
+      overview: "For a book project, photographer Timothy Greenfield-Sanders took photographs of 30 stars of adult movies..."
+      popularity: 3.8453
+      poster_path: "/kqB0fF7VlODmw1exH4iDZHGUiVI.jpg"
+      release_date: "2004-10-27"
+      title: "Thinking XXX"
+      video: false
+      vote_average: 5.5
+      vote_count: 99
 
   Error:
     type: object
@@ -365,3 +478,6 @@ definitions:
         type: string
       message:
         type: string
+    example:
+      error: "Not Found"
+      message: "The requested resource was not found"
