@@ -1,20 +1,43 @@
 #!/bin/bash
+#
+# API Client Execution Script
+#
+# This script:
+# 1. Activates the Python virtual environment
+# 2. Verifies the API is running
+# 3. Retrieves the current API key with validation
+# 4. Executes the API client script (consume_api.py)
+#
+# Usage: ./run_script.sh
+# Note: Requires the API to be running (via run_api.sh)
 
-# 1. Activate virtual environment
+# -------------------------------------------------------------------
+# Virtual Environment Activation
+# -------------------------------------------------------------------
+
+echo "Activating virtual environment..."
 if [ -d "venv/Scripts" ]; then
-        source venv/Scripts/activate  # Windows
-    else
-        source venv/bin/activate     # Linux/macOS
+    source venv/Scripts/activate  # Windows systems
+else
+    source venv/bin/activate      # Linux/macOS systems
 fi
 
-# 2. Check if API is responding
+# -------------------------------------------------------------------
+# API Availability Check
+# -------------------------------------------------------------------
+
+echo "Checking API availability..."
 if ! curl -s http://127.0.0.1:5000 >/dev/null; then
-    echo "API not responding at http://127.0.0.1:5000"
-    echo "Note: Make sure to run ./run_api.sh first"
+    echo "ERROR: API not responding at http://127.0.0.1:5000" >&2
+    echo "Solution: First run the API using './run_api.sh'" >&2
     exit 1
 fi
 
-# Get current key (with verification)
+# -------------------------------------------------------------------
+# API Key Retrieval with Validation
+# -------------------------------------------------------------------
+
+echo "Retrieving API key..."
 API_KEY=$(python3 -c "
 import sys
 try:
@@ -29,15 +52,21 @@ except Exception as e:
     exit(1)
 ")
 
+# Check if key retrieval was successful
 if [ $? -ne 0 ]; then
-    echo "$API_KEY"  # The error message was already sent to stderr
+    echo "$API_KEY" >&2  # Forward the Python error message
     exit 1
 fi
 
+# Verify key is not empty
 if [ -z "$API_KEY" ]; then
-    echo "ERROR: Got empty API key"
+    echo "ERROR: Received empty API key" >&2
     exit 1
 fi
 
-echo "Running tests with key: $API_KEY"
+# -------------------------------------------------------------------
+# Client Script Execution
+# -------------------------------------------------------------------
+
+echo "Running client script with key: $API_KEY"
 python3 consume_api.py --api-key "$API_KEY"

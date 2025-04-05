@@ -1,3 +1,22 @@
+/**
+ * FavoritesPage Component
+ *
+ * Displays a user's favorite movies with the following features:
+ * - Loads and displays favorited movies
+ * - Handles loading and error states
+ * - Shows empty state when no favorites exist
+ * - Automatically refreshes when favorites change
+ *
+ * State Management:
+ * @state {Movie[]} favoriteMovies - Array of favorite movie objects
+ * @state {boolean} isLoading - Loading state during data fetch
+ * @state {string|null} error - Error message if loading fails
+ *
+ * Dependencies:
+ * - ../services/api for fetchFavorites function
+ * - ../components/MovieList for displaying movies
+ */
+
 import React, { useEffect, useState } from 'react';
 import { fetchFavorites } from '../services/api';
 import MovieList from '../components/MovieList';
@@ -8,6 +27,9 @@ const FavoritesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Loads favorite movies from API
+   */
   const loadFavorites = async () => {
     try {
       setIsLoading(true);
@@ -24,10 +46,12 @@ const FavoritesPage: React.FC = () => {
     }
   };
 
+  // Load favorites on component mount
   useEffect(() => {
     loadFavorites();
   }, []);
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -36,6 +60,7 @@ const FavoritesPage: React.FC = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -45,6 +70,7 @@ const FavoritesPage: React.FC = () => {
           <button
             onClick={() => setError(null)}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            aria-label="Retry loading favorites"
           >
             Try Again
           </button>
@@ -64,6 +90,7 @@ const FavoritesPage: React.FC = () => {
         )}
       </div>
 
+      {/* Empty state */}
       {favoriteMovies.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-xl text-gray-600 mb-4">You haven't added any favorites yet.</p>

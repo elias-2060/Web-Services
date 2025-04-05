@@ -19,7 +19,7 @@ cd "$FRONTEND_DIR" || {
 # 1. Check if Flask API is running
 # ---------------------------
 API_URL="http://127.0.0.1:5000"
-API_KEY_FILE="../current_api_key.txt"  # Looks in parent directory
+API_KEY_FILE="../current_api_key.txt"
 
 if ! curl -s "$API_URL" >/dev/null; then
   echo "❌ Flask API not running at $API_URL"

@@ -1,3 +1,25 @@
+/**
+ * HomePage Component
+ *
+ * The main landing page that displays:
+ * - Random selection of movies
+ * - Favorite movie indicators
+ * - Count selector for number of movies to display
+ * - Error handling and loading states
+ *
+ * State Management:
+ * @state {Movie[]} movies - Array of random movie objects
+ * @state {number[]} favorites - Array of favorite movie IDs
+ * @state {boolean} isLoading - Loading state during data fetch
+ * @state {string|null} error - Main error message
+ * @state {number} count - Number of movies to display
+ * @state {string|null} favoritesError - Error specific to favorites loading
+ *
+ * Dependencies:
+ * - ../services/api for fetchRandomMovies and fetchFavorites
+ * - ../components/MovieList for displaying movies
+ */
+
 import React, { useEffect, useState } from 'react';
 import { fetchRandomMovies, fetchFavorites } from '../services/api';
 import MovieList from '../components/MovieList';
@@ -11,6 +33,9 @@ const HomePage: React.FC = () => {
   const [count, setCount] = useState(20);
   const [favoritesError, setFavoritesError] = useState<string | null>(null);
 
+  /**
+   * Loads random movies and favorites when component mounts or count changes
+   */
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -41,6 +66,9 @@ const HomePage: React.FC = () => {
     loadData();
   }, [count]);
 
+  /**
+   * Refreshes the favorites list
+   */
   const refreshFavorites = async () => {
     try {
       const favoriteMovies = await fetchFavorites();
@@ -52,6 +80,7 @@ const HomePage: React.FC = () => {
     }
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -60,6 +89,7 @@ const HomePage: React.FC = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -69,6 +99,7 @@ const HomePage: React.FC = () => {
           <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            aria-label="Reload page"
           >
             Try Again
           </button>
@@ -87,6 +118,7 @@ const HomePage: React.FC = () => {
             value={count}
             onChange={(e) => setCount(Number(e.target.value))}
             className="border rounded px-3 py-1"
+            aria-label="Number of movies to display"
           >
             <option value={8}>8</option>
             <option value={12}>12</option>
@@ -97,6 +129,7 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
+      {/* Favorites loading warning */}
       {favoritesError && (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4" role="alert">
           <strong className="font-bold">Note:</strong>
@@ -110,6 +143,7 @@ const HomePage: React.FC = () => {
         onFavoriteUpdate={refreshFavorites}
       />
 
+      {/* About section */}
       <div className="mt-12">
         <h2 className="text-2xl font-bold mb-6 text-center">About This App</h2>
         <p className="text-gray-700 max-w-2xl mx-auto text-center">

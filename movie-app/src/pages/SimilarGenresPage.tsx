@@ -1,3 +1,34 @@
+/**
+ * SimilarGenresPage Component
+ *
+ * Allows users to find movies with similar genres to a specified movie ID.
+ *
+ * Features:
+ * - Movie ID input with validation
+ * - Persistent storage of last used ID
+ * - Configurable result count
+ * - Favorite status indicators
+ * - Loading and error states
+ *
+ * URL Parameters:
+ * - movieId: Pre-fills the movie ID from URL if provided
+ *
+ * State Management:
+ * @state {Movie[]} movies - Similar movies list
+ * @state {number[]} favorites - IDs of favorite movies
+ * @state {boolean} isLoading - Loading state
+ * @state {string|null} error - Error message
+ * @state {string} movieId - Current input value
+ * @state {number|null} submittedId - Currently displayed movie ID
+ * @state {number} count - Number of movies to display
+ * @state {string|null} favoritesError - Favorites-specific error
+ *
+ * Dependencies:
+ * - react-router-dom for routing and search params
+ * - ../services/api for data fetching
+ * - ../components/MovieList for displaying movies
+ */
+
 import React, { useEffect, useState } from 'react';
 import { fetchSimilarGenres, fetchFavorites } from '../services/api';
 import MovieList from '../components/MovieList';
@@ -15,13 +46,15 @@ const SimilarGenresPage: React.FC = () => {
   const [favoritesError, setFavoritesError] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
 
-  // Load movie ID from URL or localStorage
+  /**
+   * Loads movie ID from URL or localStorage on component mount
+   */
   useEffect(() => {
     const urlMovieId = searchParams.get('movieId');
     if (urlMovieId) {
       setMovieId(urlMovieId);
       setSubmittedId(Number(urlMovieId));
-      localStorage.setItem('lastSimilarGenresMovieId', urlMovieId); // Save URL ID to localStorage
+      localStorage.setItem('lastSimilarGenresMovieId', urlMovieId);
       return;
     }
 
@@ -32,6 +65,10 @@ const SimilarGenresPage: React.FC = () => {
     }
   }, [searchParams]);
 
+  /**
+   * Handles form submission for movie ID input
+   * @param {React.FormEvent} e - Form event
+   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const id = parseInt(movieId);
@@ -43,6 +80,9 @@ const SimilarGenresPage: React.FC = () => {
     }
   };
 
+  /**
+   * Refreshes the favorites list
+   */
   const refreshFavorites = async () => {
     try {
       const favoriteMovies = await fetchFavorites();
@@ -54,6 +94,9 @@ const SimilarGenresPage: React.FC = () => {
     }
   };
 
+  /**
+   * Loads similar movies when submittedId changes
+   */
   useEffect(() => {
     if (submittedId === null) return;
 
@@ -63,6 +106,7 @@ const SimilarGenresPage: React.FC = () => {
         setError(null);
         setFavoritesError(null);
 
+        // Parallel loading of similar movies and favorites
         const [data, favoriteMovies] = await Promise.all([
           fetchSimilarGenres(submittedId),
           fetchFavorites().catch(err => {
@@ -85,6 +129,7 @@ const SimilarGenresPage: React.FC = () => {
     loadMovies();
   }, [submittedId, count]);
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -93,6 +138,7 @@ const SimilarGenresPage: React.FC = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -103,6 +149,7 @@ const SimilarGenresPage: React.FC = () => {
         <button
           onClick={() => setError(null)}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          aria-label="Clear error and try again"
         >
           Try Again
         </button>
@@ -121,6 +168,7 @@ const SimilarGenresPage: React.FC = () => {
               value={count}
               onChange={(e) => setCount(Number(e.target.value))}
               className="border rounded px-3 py-1"
+              aria-label="Number of movies to display"
             >
               <option value={8}>8</option>
               <option value={12}>12</option>
@@ -151,10 +199,12 @@ const SimilarGenresPage: React.FC = () => {
             onChange={(e) => setMovieId(e.target.value)}
             className="border rounded px-3 py-1 mr-2"
             placeholder="e.g., 123"
+            aria-label="Enter movie ID to find similar genres"
           />
           <button
             type="submit"
             className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
+            aria-label="Search for similar movies"
           >
             Search
           </button>
@@ -168,6 +218,7 @@ const SimilarGenresPage: React.FC = () => {
                 setMovies([]);
               }}
               className="px-4 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+              aria-label="Clear current search"
             >
               Clear
             </button>
@@ -198,6 +249,7 @@ const SimilarGenresPage: React.FC = () => {
           <button
             onClick={() => setSubmittedId(null)}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            aria-label="Try another movie ID"
           >
             Try Another ID
           </button>

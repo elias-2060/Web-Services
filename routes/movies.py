@@ -1,3 +1,27 @@
+"""
+Movie Recommendation API Endpoints
+
+This module contains all the API endpoints for:
+- Random movie recommendations
+- Popular movie listings
+- Genre-based recommendations
+- Runtime-based recommendations
+- Movie comparison visualization
+- Favorite movie management
+
+Each endpoint includes:
+- Authentication via API key
+- Rate limiting
+- Caching where appropriate
+- Comprehensive error handling
+
+Dependencies:
+    - Flask-RESTful for resource management
+    - Flask-Caching for response caching
+    - Flask-Limiter for rate limiting
+    - requests for TMDB API communication
+"""
+
 import random
 import requests
 from flask import jsonify, request
@@ -7,17 +31,31 @@ from utils import verify_api_key
 import json
 
 
-# Endpoint to list random movies
 class RandomMovies(Resource):
+    """
+    Endpoint for retrieving random movies from TMDB
+
+    GET /movies/random
+    Query Parameters:
+        n (int): Number of movies to return (1-20, default: 10)
+
+    Features:
+        - Cached for 5 minutes
+        - Rate limited (10 requests/minute)
+        - Returns random selection from a random TMDB page
+    """
+
     @cache.cached(timeout=300, query_string=True)  # Cache based on query parameters
     @limiter.limit(RATE_LIMITS["random_movies"])
     def get(self):
+        """Handle GET request for random movies"""
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
             return auth_error
 
         try:
+            # Validate and parse 'n' parameter
             n = int(request.args.get('n', 10))  # Default to 10 movies
             if not (1 <= n <= 20):
                 return {
@@ -25,13 +63,13 @@ class RandomMovies(Resource):
                     "message": "n must be between 1 and 20"
                 }, 400
 
-            # Get a random page
+            # Get a random page from TMDB (pages 1-500)
             random_page = random.randint(1, 500)
             response = requests.get(
                 f"{TMDB_BASE_URL}/discover/movie?api_key={TMDB_API_KEY}&language=en-US&page={random_page}")
             data = response.json()
 
-            # Shuffle and return a random selection
+            # Process and return random selection
             movies = data.get('results', [])
             if not movies:
                 return {
@@ -48,17 +86,31 @@ class RandomMovies(Resource):
             }, 500
 
 
-# Endpoint to list popular movies
 class PopularMovies(Resource):
+    """
+    Endpoint for retrieving currently popular movies from TMDB
+
+    GET /movies/popular
+    Query Parameters:
+        n (int): Number of movies to return (1-20, default: 10)
+
+    Features:
+        - Cached for 5 minutes
+        - Rate limited (10 requests/minute)
+        - Returns current popular movies from TMDB
+    """
+
     @cache.cached(timeout=300, query_string=True)  # Cache based on query parameters
-    @limiter.limit(RATE_LIMITS["popular_movies"])  # Max 10 requests per minute
+    @limiter.limit(RATE_LIMITS["popular_movies"])
     def get(self):
+        """Handle GET request for popular movies"""
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
             return auth_error
 
         try:
+            # Validate and parse 'n' parameter
             n = int(request.args.get('n', 10))
             if not (1 <= n <= 20):
                 return {
@@ -66,6 +118,7 @@ class PopularMovies(Resource):
                     "message": "n must be between 1 and 20"
                 }, 400
 
+            # Get popular movies from TMDB
             response = requests.get(f"{TMDB_BASE_URL}/movie/popular?api_key={TMDB_API_KEY}&language=en-US&page=1")
             data = response.json()
 
@@ -83,17 +136,29 @@ class PopularMovies(Resource):
             }, 500
 
 
-# Endpoint to find movies with similar genres
 class SimilarGenres(Resource):
-    @cache.cached(timeout=300, key_prefix=lambda: f"genres_{request.view_args.get('movie_id')}")  # Cache based on movie_id
-    @limiter.limit(RATE_LIMITS["similar_genres"])  # Max 5 requests per minute
+    """
+    Endpoint for finding movies with similar genres
+
+    GET /movies/<int:movie_id>/similar-genres
+
+    Features:
+        - Cached for 5 minutes (by movie_id)
+        - Rate limited (100 requests/minute)
+        - Returns movies sharing all genres of the specified movie
+    """
+
+    @cache.cached(timeout=300, key_prefix=lambda: f"genres_{request.view_args.get('movie_id')}")
+    @limiter.limit(RATE_LIMITS["similar_genres"])
     def get(self, movie_id):
+        """Handle GET request for genre-based recommendations"""
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
             return auth_error
 
         try:
+            # Get movie details from TMDB
             response = requests.get(f"{TMDB_BASE_URL}/movie/{movie_id}?api_key={TMDB_API_KEY}")
             if response.status_code == 404:
                 return {
@@ -110,6 +175,7 @@ class SimilarGenres(Resource):
                     "message": f"No genres found for movie ID {movie_id}"
                 }, 400
 
+            # Find movies with matching genres
             genre_query = ','.join(map(str, genres))
             response = requests.get(f"{TMDB_BASE_URL}/discover/movie?api_key={TMDB_API_KEY}&with_genres={genre_query}")
             results = response.json().get('results', [])
@@ -128,17 +194,29 @@ class SimilarGenres(Resource):
             }, 500
 
 
-# Endpoint to find movies with a similar runtime
 class SimilarRuntime(Resource):
-    @cache.cached(timeout=300, key_prefix=lambda: f"runtime_{request.view_args.get('movie_id')}")  # Cache based on movie_id
+    """
+    Endpoint for finding movies with similar runtime
+
+    GET /movies/<int:movie_id>/similar-runtime
+
+    Features:
+        - Cached for 5 minutes (by movie_id)
+        - Rate limited (100 requests/minute)
+        - Returns movies with runtime within ±10 minutes of specified movie
+    """
+
+    @cache.cached(timeout=300, key_prefix=lambda: f"runtime_{request.view_args.get('movie_id')}")
     @limiter.limit(RATE_LIMITS["similar_runtime"])
     def get(self, movie_id):
+        """Handle GET request for runtime-based recommendations"""
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
             return auth_error
 
         try:
+            # Get movie details from TMDB
             response = requests.get(f"{TMDB_BASE_URL}/movie/{movie_id}?api_key={TMDB_API_KEY}")
             if response.status_code == 404:
                 return {
@@ -155,6 +233,7 @@ class SimilarRuntime(Resource):
                     "message": f"Runtime not found for movie ID {movie_id}"
                 }, 400
 
+            # Find movies with similar runtime (±10 minutes)
             min_runtime, max_runtime = runtime - 10, runtime + 10
             response = requests.get(
                 f"{TMDB_BASE_URL}/discover/movie?api_key={TMDB_API_KEY}&with_runtime.gte={min_runtime}&with_runtime.lte={max_runtime}")
@@ -174,17 +253,33 @@ class SimilarRuntime(Resource):
             }, 500
 
 
-# Endpoint to generate a bar plot comparing movie scores
 class MovieComparison(Resource):
-    @cache.cached(timeout=600, key_prefix=lambda: str(request.json.get('movie_ids', [])))  # Cache based on movie_ids
+    """
+    Endpoint for generating movie comparison charts
+
+    POST /movies/compare
+    Request Body:
+        {
+            "movie_ids": [int, int, ...]  # Array of TMDB movie IDs
+        }
+
+    Features:
+        - Cached for 10 minutes (by movie_ids)
+        - Rate limited (100 requests/minute)
+        - Returns URL to generated comparison chart
+    """
+
+    @cache.cached(timeout=600, key_prefix=lambda: str(request.json.get('movie_ids', [])))
     @limiter.limit(RATE_LIMITS["movie_comparison"])
     def post(self):
+        """Handle POST request for movie comparisons"""
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
             return auth_error
 
         try:
+            # Validate request body
             if not request.json or 'movie_ids' not in request.json:
                 return {
                     "error": "invalid_request",
@@ -198,6 +293,7 @@ class MovieComparison(Resource):
                     "message": "No movie IDs provided"
                 }, 400
 
+            # Fetch data for all movies
             movie_data = []
             not_found_ids = []
 
@@ -211,6 +307,7 @@ class MovieComparison(Resource):
                 if 'vote_average' in data:
                     movie_data.append({"title": data['title'], "score": data['vote_average']})
 
+            # Handle partial failures
             if not_found_ids:
                 return {
                     "error": "movies_not_found",
@@ -224,6 +321,7 @@ class MovieComparison(Resource):
                     "message": "No valid movies found with score data"
                 }, 400
 
+            # Generate comparison chart
             chart_data = {
                 "type": "bar",
                 "data": {
@@ -240,20 +338,34 @@ class MovieComparison(Resource):
             }, 500
 
 
-# Endpoint to manage favorite movies
+# Data structure to keep track of the favorites
 favorites = []
 
 
 class FavoriteMovies(Resource):
+    """
+    Endpoint for managing favorite movies
+
+    Supported operations:
+    - POST /movies/favorites/<int:movie_id>   # Add to favorites
+    - DELETE /movies/favorites/<int:movie_id> # Remove from favorites
+    - GET /movies/favorites                   # List favorites
+
+    Features:
+        - Rate limited (100 requests/minute)
+        - Validates movie existence in TMDB
+    """
+
     @limiter.limit(RATE_LIMITS["favorites"])
     def post(self, movie_id):
+        """Handle POST request to add a favorite movie"""
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
             return auth_error
 
         try:
-            # First verify the movie exists
+            # First verify the movie exists in TMDB
             response = requests.get(f"{TMDB_BASE_URL}/movie/{movie_id}?api_key={TMDB_API_KEY}")
             if response.status_code == 404:
                 return {
@@ -285,6 +397,7 @@ class FavoriteMovies(Resource):
 
     @limiter.limit(RATE_LIMITS["favorites"])
     def delete(self, movie_id):
+        """Handle DELETE request to remove a favorite movie"""
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:
@@ -314,6 +427,7 @@ class FavoriteMovies(Resource):
 
     @limiter.limit(RATE_LIMITS["favorites"])
     def get(self):
+        """Handle GET request to list favorite movies"""
         # Verify API Key
         auth_error = verify_api_key()
         if auth_error:

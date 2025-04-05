@@ -1,3 +1,31 @@
+/**
+ * PopularMoviesPage Component
+ *
+ * Displays currently popular movies with the following features:
+ * - Configurable number of movies to display
+ * - Favorite status indicators
+ * - Loading and error states
+ * - Automatic refresh of favorites
+ *
+ * Features:
+ * - Responsive grid layout
+ * - Dynamic loading based on count selection
+ * - Error handling for both movies and favorites
+ * - Empty state handling
+ *
+ * State Management:
+ * @state {Movie[]} movies - Popular movies list
+ * @state {number[]} favorites - IDs of favorite movies
+ * @state {boolean} isLoading - Loading state
+ * @state {string|null} error - Main error message
+ * @state {number} count - Number of movies to display
+ * @state {string|null} favoritesError - Favorites-specific error
+ *
+ * Dependencies:
+ * - ../services/api for data fetching
+ * - ../components/MovieList for displaying movies
+ */
+
 import React, { useEffect, useState } from 'react';
 import { fetchPopularMovies, fetchFavorites } from '../services/api';
 import MovieList from '../components/MovieList';
@@ -11,7 +39,10 @@ const PopularMoviesPage: React.FC = () => {
   const [count, setCount] = useState(20);
   const [favoritesError, setFavoritesError] = useState<string | null>(null);
 
-  // Load both popular movies and favorites
+  /**
+   * Loads both popular movies and favorites
+   * Handles errors separately for movies and favorites
+   */
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -19,9 +50,11 @@ const PopularMoviesPage: React.FC = () => {
         setError(null);
         setFavoritesError(null);
 
+        // Load popular movies
         const popularMovies = await fetchPopularMovies(count);
         setMovies(popularMovies);
 
+        // Try to load favorites (non-blocking if it fails)
         try {
           const favoriteMovies = await fetchFavorites();
           setFavorites(favoriteMovies.map(movie => movie.id));
@@ -40,6 +73,9 @@ const PopularMoviesPage: React.FC = () => {
     loadData();
   }, [count]);
 
+  /**
+   * Refreshes the favorites list
+   */
   const refreshFavorites = async () => {
     try {
       const favoriteMovies = await fetchFavorites();
@@ -51,6 +87,7 @@ const PopularMoviesPage: React.FC = () => {
     }
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -59,6 +96,7 @@ const PopularMoviesPage: React.FC = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -68,6 +106,7 @@ const PopularMoviesPage: React.FC = () => {
           <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            aria-label="Reload page"
           >
             Try Again
           </button>
@@ -86,6 +125,7 @@ const PopularMoviesPage: React.FC = () => {
             value={count}
             onChange={(e) => setCount(Number(e.target.value))}
             className="border rounded px-3 py-1"
+            aria-label="Number of movies to display"
           >
             <option value={8}>8</option>
             <option value={12}>12</option>
@@ -96,6 +136,7 @@ const PopularMoviesPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Favorites loading warning */}
       {favoritesError && (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4" role="alert">
           <strong className="font-bold">Note:</strong>
@@ -109,12 +150,14 @@ const PopularMoviesPage: React.FC = () => {
         onFavoriteUpdate={refreshFavorites}
       />
 
+      {/* Empty state */}
       {movies.length === 0 && (
         <div className="text-center py-12">
           <p className="text-xl text-gray-600">No popular movies found.</p>
           <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            aria-label="Reload page"
           >
             Try Again
           </button>

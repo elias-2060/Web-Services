@@ -1,6 +1,5 @@
 from routes.movies import *
 from config import *
-from utils import *
 from flask_cors import CORS
 import argparse
 
@@ -13,7 +12,7 @@ args = parser.parse_args()
 API_KEY = args.api_key
 print(f"API started with key: {API_KEY}")
 
-# Allow only my frontend's origin
+# Allow only my frontend origin
 CORS(app, resources={
     r"/movies/*": {
         "origins": ["http://localhost:3000"],
