@@ -189,7 +189,11 @@ const MovieCard: React.FC<MovieCardProps> = ({
         {/* Back of the card - Extended movie info */}
         <div className={`absolute top-0 left-0 w-full h-full bg-white rounded-lg shadow-md p-5 backface-hidden rotate-y-180 ${!isFlipped ? 'hidden' : ''}`}>
           <h3 className="text-xl font-bold mb-3">{movie.title}</h3>
-          <p className="text-gray-600 text-sm mb-4 line-clamp-5">{movie.overview}</p>
+
+          {/* Scrollable overview container */}
+          <div className="overflow-y-auto max-h-[120px] pr-2 mb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            <p className="text-gray-600 text-sm">{movie.overview}</p>
+          </div>
 
           {/* Detailed movie information grid */}
           <div className="grid grid-cols-2 gap-4 mb-5">
