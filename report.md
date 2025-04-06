@@ -132,7 +132,7 @@
 - **What?** A responsive UI to interact with the API.  
 - **Why?** Provides a user-friendly way to explore movies.  
 - **How?** Uses `fetch()` for API calls and Tailwind for styling.
-- **How to run?** Run the start_frontend.sh script, which will install the necessary packages and start the server
+- **How to run?** Run the **start_frontend.sh** script, which will install the necessary packages and start the server
 - **Example picture:** ![Alt text](Frontend_pic.png)
 
 ---
