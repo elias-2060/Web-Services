@@ -68,7 +68,7 @@ def verify_api_key():
     provided_key = request.headers.get("API-Key", "").strip()
 
     if not current_key or provided_key != current_key:
-        return {"error": "Invalid API key"}, 401
+        return {"error": "Invalid API key", "message": "API key is missing or invalid."}, 401
     return None
 
 
