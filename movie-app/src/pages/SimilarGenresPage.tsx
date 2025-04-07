@@ -90,7 +90,7 @@ const SimilarGenresPage: React.FC = () => {
       setFavoritesError(null);
     } catch (err) {
       console.error('Failed to refresh favorites:', err);
-      setFavoritesError('Failed to update favorites. Please try again.');
+      setFavoritesError('You have no favorites. You can favorite movies by clicking the heart icon.');
     }
   };
 
@@ -111,7 +111,7 @@ const SimilarGenresPage: React.FC = () => {
           fetchSimilarGenres(submittedId),
           fetchFavorites().catch(err => {
             console.error('Failed to load favorites:', err);
-            setFavoritesError('Failed to load favorites. You may need to refresh.');
+            setFavoritesError('You have no favorites. You can favorite movies by clicking the heart icon.');
             return [];
           })
         ]);

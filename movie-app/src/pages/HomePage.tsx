@@ -53,7 +53,7 @@ const HomePage: React.FC = () => {
           setFavorites(favoriteMovies.map(movie => movie.id));
         } catch (err) {
           console.error('Failed to load favorites:', err);
-          setFavoritesError('You have no favorites. You can favorite movies by clicking the heart icon.');;
+          setFavoritesError('You have no favorites. You can favorite movies by clicking the heart icon.');
         }
       } catch (err) {
         setError('Failed to load movies. Please try again later.');
