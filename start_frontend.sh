@@ -19,7 +19,7 @@ cd "$FRONTEND_DIR" || {
 # 1. Check if Flask API is running
 # ---------------------------
 API_URL="http://127.0.0.1:5000"
-API_KEY_FILE="../current_api_key.txt"
+API_KEY_FILE="../current_api_key.txt"  # Looks in parent directory
 
 if ! curl -s "$API_URL" >/dev/null; then
   echo "❌ Flask API not running at $API_URL"
@@ -49,6 +49,18 @@ npm install || {
   echo "❌ Failed to install npm packages"
   exit 1
 }
+
+# ---------------------------
+# 3.5 Fix react-scripts permissions
+# ---------------------------
+echo "🔒 Setting react-scripts permissions..."
+if [ -f "node_modules/.bin/react-scripts" ]; then
+  chmod +x node_modules/.bin/react-scripts || {
+    echo "⚠️ Could not set react-scripts permissions (may cause issues)"
+  }
+else
+  echo "⚠️ react-scripts not found in node_modules/.bin/"
+fi
 
 # ---------------------------
 # 4. Start React with API key
