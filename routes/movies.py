@@ -31,6 +31,69 @@ from utils import verify_api_key
 import json
 
 
+class MovieRoot(Resource):
+    """
+    Root endpoint for movie resources that describes available endpoints
+
+    GET /movies/
+
+    Features:
+        - Returns discoverable links to all movie-related endpoints
+        - Makes API navigation intuitive
+    """
+
+    @cache.cached(timeout=300)
+    @limiter.limit(RATE_LIMITS["favorites"])
+    def get(self):
+        """Handle GET request for API root discovery"""
+        # Verify API Key
+        auth_error = verify_api_key()
+        if auth_error:
+            return auth_error
+
+        try:
+            base_url = request.url_root.rstrip('/')  # Get current server address
+
+            return {
+                "_links": {
+                    "self": {"href": f"{base_url}/movies/"},
+                    "random": {"href": f"{base_url}/movies/random", "templated": False},
+                    "popular": {"href": f"{base_url}/movies/popular", "templated": False},
+                    "similar_genres": {
+                        "href": f"{base_url}/movies/{{movie_id}}/similar-genres",
+                        "templated": True,
+                        "description": "Replace {movie_id} with actual ID"
+                    },
+                    "similar_runtime": {
+                        "href": f"{base_url}/movies/{{movie_id}}/similar-runtime",
+                        "templated": True
+                    },
+                    "compare": {
+                        "href": f"{base_url}/movies/compare",
+                        "method": "POST",
+                        "description": "Requires movie_ids in request body"
+                    },
+                    "favorites": {
+                        "collection": {
+                            "href": f"{base_url}/movies/favorites",
+                            "methods": ["GET"]
+                        },
+                        "item": {
+                            "href": f"{base_url}/movies/favorites/{{movie_id}}",
+                            "methods": ["POST", "DELETE"],
+                            "templated": True
+                        }
+                    }
+                },
+                "description": "Movie Recommendation API - navigate using the _links property"
+            }
+        except Exception as e:
+            return {
+                "error": "server_error",
+                "message": f"An error occurred while generating API discovery: {str(e)}"
+            }, 500
+
+
 class RandomMovies(Resource):
     """
     Endpoint for retrieving random movies from TMDB

@@ -14,7 +14,135 @@ security:
   - ApiKeyAuth: []
 
 paths:
-  /movies:
+  /movies/:
+    get:
+      tags:
+        - Movies
+      summary: "API discovery endpoint - lists all available movie endpoints"
+      description: "Provides hypermedia links to navigate the entire Movie API"
+      responses:
+        200:
+          description: "API discovery information with all available endpoints"
+          schema:
+            type: object
+            properties:
+              _links:
+                type: object
+                properties:
+                  self:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                  random:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                      templated:
+                        type: boolean
+                  popular:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                      templated:
+                        type: boolean
+                  similar_genres:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                      templated:
+                        type: boolean
+                      description:
+                        type: string
+                  similar_runtime:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                      templated:
+                        type: boolean
+                  compare:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                      method:
+                        type: string
+                      description:
+                        type: string
+                  favorites:
+                    type: object
+                    properties:
+                      collection:
+                        type: object
+                        properties:
+                          href:
+                            type: string
+                          methods:
+                            type: array
+                            items:
+                              type: string
+                      item:
+                        type: object
+                        properties:
+                          href:
+                            type: string
+                          methods:
+                            type: array
+                            items:
+                              type: string
+                          templated:
+                            type: boolean
+              description:
+                type: string
+          examples:
+            application/json:
+              {
+                "_links": {
+                  "self": {"href": "https://127.0.0.1:5000/movies/"},
+                  "random": {"href": "https://127.0.0.1:5000/movies/random", "templated": false},
+                  "popular": {"href": "https:/127.0.0.1:5000/movies/popular", "templated": false},
+                  "similar_genres": {
+                    "href": "https://127.0.0.1:5000/movies/{movie_id}/similar-genres",
+                    "templated": true,
+                    "description": "Replace {movie_id} with actual ID"
+                  },
+                  "similar_runtime": {
+                    "href": "https://127.0.0.1:5000/movies/{movie_id}/similar-runtime",
+                    "templated": true
+                  },
+                  "compare": {
+                    "href": "https://127.0.0.1:5000/movies/compare",
+                    "method": "POST",
+                    "description": "Requires movie_ids in request body"
+                  },
+                  "favorites": {
+                    "collection": {
+                      "href": "https://127.0.0.1:5000/movies/favorites",
+                      "methods": ["GET"]
+                    },
+                    "item": {
+                      "href": "https://127.0.0.1:5000/movies/favorites/{movie_id}",
+                      "methods": ["POST", "DELETE"],
+                      "templated": true
+                    }
+                  }
+                },
+                "description": "Movie Recommendation API - navigate using the _links property"
+              }
+        401:
+          description: "Unauthorized - Invalid or missing API key"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/Error"
+
+  /movies/random:
     get:
       tags:
         - Movies

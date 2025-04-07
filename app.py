@@ -22,7 +22,8 @@ CORS(app, resources={
 })
 
 # Register Routes
-api.add_resource(RandomMovies, "/movies")
+api.add_resource(MovieRoot, '/movies/')
+api.add_resource(RandomMovies, "/movies/random")
 api.add_resource(PopularMovies, "/movies/popular")
 api.add_resource(SimilarGenres, "/movies/<int:movie_id>/similar-genres")
 api.add_resource(SimilarRuntime, "/movies/<int:movie_id>/similar-runtime")

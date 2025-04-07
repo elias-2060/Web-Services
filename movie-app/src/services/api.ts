@@ -95,7 +95,7 @@ const apiRequest = async <T>(endpoint: string, options: RequestInit = {}): Promi
  * @returns {Promise<Movie[]>} - Array of random movies
  */
 export const fetchRandomMovies = async (count: number = 10): Promise<Movie[]> => {
-  return apiRequest(`/movies?n=${count}`);
+  return apiRequest(`/movies/random?n=${count}`);
 };
 
 /**

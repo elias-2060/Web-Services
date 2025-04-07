@@ -11,11 +11,19 @@
 - No server-side session storage is used.
 
 **Resource-Based URLs**  
-- Endpoints follow a logical structure (e.g., `/movies`, `/movies/popular`, `/movies/{movie_id}/similar-genres`).
+- Endpoints follow a logical structure (e.g., `/movies/`, `/movies/popular`, `/movies/random`, `/movies/{movie_id}/similar-genres`).
 - URLs use nouns not verbs
+- URLs are short
+- URLs are hackable up the tree
+- URLs are meaningful
+- URLs are resource-oriented
+- URLs are permanent
+- URLs are predictable and human-readable
+- Query arguments are only for parameters
+- URLs avoid extensions
 
 **HTTP Methods**  
-- `GET` for retrieving data (e.g., `/movies/random`).  
+- `GET` for retrieving data (e.g., `/movies/popular`).  
 - `POST` for creating resources (e.g., `/movies/favorites/{movie_id}`).  
 - `DELETE` for removing resources (e.g., `/movies/favorites/{movie_id}`).
 
